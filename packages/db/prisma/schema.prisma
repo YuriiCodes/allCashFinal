@@ -2,16 +2,36 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model Post {
-    id      String @id @default(cuid())
-    title   String
-    content String
+model Balances {
+  id         Int               @id
+  userId     Int
+  currSymbol String            @db.VarChar(20)
+  name       String            @db.VarChar(50)
+  amount     Int
+  Expenses   Expenses[]
+  Defaults   DefaultBalances[]
+}
+
+model Expenses {
+  id        Int      @id
+  userId    Int
+  balanceId Int
+  amount    Float
+  Balances  Balances @relation(fields: [balanceId], references: [id])
+}
+
+model DefaultBalances {
+  id        Int      @id
+  balanceId Int
+  userId    Int
+  Balances  Balances @relation(fields: [balanceId], references: [id])
 }
